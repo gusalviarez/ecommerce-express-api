@@ -1,6 +1,6 @@
 import { pool } from "./db.js";
 
-export const getProducts = async (req, res) => {
+export const getUsers = async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM products");
     res.json(rows);
@@ -9,7 +9,7 @@ export const getProducts = async (req, res) => {
   }
 };
 
-export const getProductById = async (req, res) => {
+export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await pool.query("SELECT * FROM products WHERE id = ?", [
@@ -26,7 +26,7 @@ export const getProductById = async (req, res) => {
   }
 };
 
-export const deleteProduct = async (req, res) => {
+export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await pool.query("DELETE FROM products WHERE id = ?", [id]);
@@ -41,7 +41,7 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-export const createProduct = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
     const { name, price } = req.body;
     const [rows] = await pool.query(
@@ -54,7 +54,7 @@ export const createProduct = async (req, res) => {
   }
 };
 
-export const updateProduct = async (req, res) => {
+export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, price } = req.body;

@@ -1,5 +1,6 @@
 import express from "express";
 import productRoutes from "./products.routes.js";
+import categoryRoutes from "./categories.routes.js";
 import morgan from "morgan";
 import { PORT } from "./config.js";
 import cors from "cors";
@@ -31,6 +32,7 @@ app.get("/", welcome);
 
 // routes
 app.use(productRoutes);
+app.use(categoryRoutes);
 
 app.listen(PORT);
 // eslint-disable-next-line no-console

@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   createProduct,
   deleteProduct,
-  getProduct,
+  getProductById,
   getProducts,
   updateProduct,
 } from "./products.controllers.js";
@@ -11,7 +11,7 @@ const router = Router();
 
 router.get("/products", getProducts);
 
-router.get("/products/:id", getProduct);
+router.get("/products/:id", getProductById);
 
 router.delete("/products/:id", deleteProduct);
 
