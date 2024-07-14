@@ -15,6 +15,15 @@ CREATE TABLE categories(
   name VARCHAR(255) NOT NULL UNIQUE
 );
 
+CREATE TABLE users (
+  id VARCHAR(64) PRIMARY KEY DEFAULT UUID(),
+  username VARCHAR(255) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash CHAR(60) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 INSERT INTO products (name, price, description, category) VALUES
   ('Mens T-Shirt', 19.99, 'A comfortable and stylish T-shirt for men.', 'Men'),
   ('Womens Sneakers', 49.95, 'Stylish and comfortable sneakers for women.', 'Shoes');
@@ -22,6 +31,10 @@ INSERT INTO products (name, price, description, category) VALUES
 INSERT INTO categories (name) VALUES
   ('Men'),
   ('Shoes');
+
+INSERT INTO users (id, username, email, password_hash) VALUES
+(UUID(), 'john_doe', 'john.doe@example.com', '<hashed_password_1>'),
+(UUID(), 'jane_smith', 'jane.smith@example.com', '<hashed_password_2>');
 
 
 CREATE TABLE product_categories (
