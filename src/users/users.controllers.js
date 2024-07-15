@@ -2,7 +2,7 @@ import { pool } from "./db.js";
 
 export const getUsers = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM products");
+    const [rows] = await pool.query("SELECT * FROM users");
     res.json(rows);
   } catch (error) {
     return res.status(500).json({ message: "Something goes wrong" });
@@ -12,12 +12,10 @@ export const getUsers = async (req, res) => {
 export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query("SELECT * FROM products WHERE id = ?", [
-      id,
-    ]);
+    const [rows] = await pool.query("SELECT * FROM users WHERE id = ?", [id]);
 
     if (rows.length <= 0) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.json(rows[0]);
@@ -29,10 +27,10 @@ export const getUserById = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query("DELETE FROM products WHERE id = ?", [id]);
+    const [rows] = await pool.query("DELETE FROM users WHERE id = ?", [id]);
 
     if (rows.affectedRows <= 0) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.sendStatus(204);
@@ -43,12 +41,12 @@ export const deleteUser = async (req, res) => {
 
 export const createUser = async (req, res) => {
   try {
-    const { name, price } = req.body;
+    const { username, email, password_hash } = req.body;
     const [rows] = await pool.query(
-      "INSERT INTO products (name, price) VALUES (?, ?)",
-      [name, price],
+      "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
+      [username, email, password_hash],
     );
-    res.status(201).json({ id: rows.insertId, name, price });
+    res.status(201).json({ id: rows.insertId, username, email, password_hash });
   } catch (error) {
     return res.status(500).json({ message: "Something goes wrong" });
   }
@@ -57,19 +55,17 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price } = req.body;
+    const { username, email, password_hash } = req.body;
     const [result] = await pool.query(
-      "UPDATE products SET name = ?, price = ? WHERE id = ?",
-      [name, price, id],
+      "UPDATE users SET username = ?, email = ?, password_hash = ? WHERE id = ?",
+      [username, email, password_hash, id],
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const [rows] = await pool.query("SELECT * FROM products WHERE id = ?", [
-      id,
-    ]);
+    const [rows] = await pool.query("SELECT * FROM users WHERE id = ?", [id]);
     res.json(rows[0]);
   } catch (error) {
     return res.status(500).json({ message: "Something goes wrong" });
