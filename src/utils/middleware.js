@@ -1,4 +1,4 @@
-import { ErrorResponse } from "./errors";
+import { ErrorResponse } from "./errors.js";
 
 export const errorHandler = (err, req, res, next) => {
   if (err instanceof ErrorResponse) {

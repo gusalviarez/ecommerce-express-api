@@ -1,77 +1,35 @@
-import { pool } from "../config/db.js";
+import { tryCatch } from "../utils/middleware.js"
+import { ProductModel } from "./model.js"
 
-export const getProducts = async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT * FROM products");
-    res.json(rows);
-  } catch (error) {
-    return res.status(500).json({ message: "Something goes wrong" });
-  }
-};
+export const getProducts = tryCatch(async (req, res) => {
+  const products = await ProductModel.getProducts()
+  res.json(products)
+});
 
-export const getProductById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const [rows] = await pool.query("SELECT * FROM products WHERE id = ?", [
-      id,
-    ]);
+export const getProductById = tryCatch( async (req, res) => {
+  const { id } = req.params;
+  const product = await ProductModel.getProductById({ id })
+  // send error if product not found 
+  res.json(product[0]);
+});
 
-    if (rows.length <= 0) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+export const deleteProduct = tryCatch( async (req, res) => {
+  const { id } = req.params;
+  const rows = await ProductModel.delete({ id })
+  // send an error if the it wasnt deleted
+  res.sendStatus(204);
+});
 
-    res.json(rows[0]);
-  } catch (error) {
-    return res.status(500).json({ message: "Something goes wrong" });
-  }
-};
+export const createProduct = tryCatch( async (req, res) => {
+  const { name, price } = req.body;
+  const rows = await ProductModel.create({name, price})
+  res.status(201).json({ id: rows.insertId, name, price });
+});
 
-export const deleteProduct = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const [rows] = await pool.query("DELETE FROM products WHERE id = ?", [id]);
-
-    if (rows.affectedRows <= 0) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    res.sendStatus(204);
-  } catch (error) {
-    return res.status(500).json({ message: "Something goes wrong" });
-  }
-};
-
-export const createProduct = async (req, res) => {
-  try {
-    const { name, price } = req.body;
-    const [rows] = await pool.query(
-      "INSERT INTO products (name, price) VALUES (?, ?)",
-      [name, price],
-    );
-    res.status(201).json({ id: rows.insertId, name, price });
-  } catch (error) {
-    return res.status(500).json({ message: "Something goes wrong" });
-  }
-};
-
-export const updateProduct = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, price } = req.body;
-    const [result] = await pool.query(
-      "UPDATE products SET name = ?, price = ? WHERE id = ?",
-      [name, price, id],
-    );
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    const [rows] = await pool.query("SELECT * FROM products WHERE id = ?", [
-      id,
-    ]);
-    res.json(rows[0]);
-  } catch (error) {
-    return res.status(500).json({ message: "Something goes wrong" });
-  }
-};
+export const updateProduct = tryCatch( async (req, res) => {
+  const { id } = req.params;
+  const { name, price } = req.body;
+  const result = await ProductModel.update({ id,name,price })
+  const rows = await ProductModel.getProductById({id})
+  res.json(rows[0]);
+});
