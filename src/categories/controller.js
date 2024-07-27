@@ -1,79 +1,49 @@
-import { pool } from "../config/db.js";
+import { CategoryModel } from "./model.js";
 
 export const getCategories = async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT * FROM categories");
+    const rows = await CategoryModel.getAll()
     res.json(rows);
-  } catch (error) {
-    return res.status(500).json({ message: "Something goes wrong" });
-  }
 };
 
 export const getCategoryByName = async (req, res) => {
-  try {
     const { name } = req.params;
-    const [rows] = await pool.query("SELECT * FROM categories WHERE name = ?", [
-      name,
-    ]);
+    const rows = await CategoryModel.getByName({name}) 
 
     if (rows.length <= 0) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "Category not found" });
     }
     res.json(rows[0]);
-  } catch (error) {
-    return res.status(500).json({ message: "something when wrong" });
-  }
 };
 
 export const createCategory = async (req, res) => {
-  try {
     const { name } = req.body;
-    const [rows] = await pool.query(
-      "INSERT INTO categories (name) VALUES (?)",
-      [name],
-    );
+    console.log(name)
+    const rows = await CategoryModel.create({ name });
+    console.log(rows)
     res.status(201).json({ id: rows.insertId, name });
-  } catch (error) {
-    return res.status(500).json({ message: "something when wrong" });
-  }
 };
 
 export const deleteCategory = async (req, res) => {
-  try {
     const { name } = req.params;
-    const [rows] = await pool.query("DELETE FROM categories WHERE name = ?", [
-      name,
-    ]);
+    const rows = await CategoryModel.delete({name}) 
 
     if (rows.affectedRows <= 0) {
       return res.status(404).json({ message: "Product not found" });
     }
 
     res.sendStatus(204);
-  } catch (error) {
-    return res.status(500).json({ message: "Something goes wrong" });
-  }
 };
 
 export const updateCategory = async (req, res) => {
-  try {
     const { name } = req.params;
     const { newName } = req.body;
 
-    const [result] = await pool.query(
-      "UPDATE categories SET name = ? WHERE name = ?",
-      [newName, name],
-    );
+    const result = await CategoryModel.update({name, newName})
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    const [rows] = await pool.query("SELECT * FROM products WHERE name = ?", [
-      newName,
-    ]);
+    const rows = await CategoryModel.getByName({newName})
     res.json(rows[0]);
-  } catch (error) {
-    return res.status(500).json({ message: "Something goes wrong" });
-  }
 };
